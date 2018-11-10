@@ -11,7 +11,7 @@ import { SubscriptionServer } from 'subscriptions-transport-ws'
 import api from './api'
 import config from '../nuxt.config.js'
 import apolloServer from './graphql'
-import { boards, cards, lists} from '../__mock__/data'
+import { boards, cards, lists } from '../__mock__/data'
 
 import Board from './models/board'
 import Card from './models/card'
@@ -51,35 +51,41 @@ if (config.dev) {
 // Give nuxt middleware to express
 app.use(nuxt.render)
 
-const mockgoose = new Mockgoose(mongoose)
-const proxy = process.env.http_proxy
-if (proxy) {
-  mockgoose.helper.setProxy(proxy)
+apolloServer.applyMiddleware({ app })
+
+
+async function init_db(isDev = true) {
+  if (isDev) {
+    const mockgoose = new Mockgoose(mongoose)
+    const proxy = process.env.http_proxy
+    if (proxy) {
+      mockgoose.helper.setProxy(proxy)
+    }
+    await mockgoose.prepareStorage()
+  }
+  await mongoose.connect('mongodb://foobar/baz')
+  if (isDev) {
+    await Board.create(boards)
+    await Card.create(cards)
+    await List.create(lists)
+  }
 }
 
-apolloServer.applyMiddleware({app})
+async function start() {
+  await init_db(config.dev)
 
+  // const ws = createServer(app)
+  // ws.listen(port, host, () => {
+  //   return new SubscriptionServer({
+  //     execute,
+  //     subscribe,
+  //     schema
+  //   }, {
+  //     server: ws,
+  //     path: '/api/subscriptions'
+  //   })
+  // })
+  app.listen({ port }, () => { console.log("listening") })
+}
 
-mockgoose.prepareStorage()
-  .then(() => {
-    mongoose.connect('mongodb://foobar/baz')
-    mongoose.connection.on('connected', () => {
-      Board.create(boards)
-        .then(Card.create(cards))
-        .then(List.create(lists))
-        .then(() => {
-          // const ws = createServer(app)
-          // ws.listen(port, host, () => {
-          //   return new SubscriptionServer({
-          //     execute,
-          //     subscribe,
-          //     schema
-          //   }, {
-          //     server: ws,
-          //     path: '/api/subscriptions'
-          //   })
-          // })
-          app.listen({port}, () => {console.log("listening")})
-        })
-    })
-  })
+start()
