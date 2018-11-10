@@ -1,4 +1,7 @@
-module.exports = {
+// https://github.com/buefy/nuxt-buefy/issues/32
+global.File= typeof window === 'undefined' ? Object : window.File
+
+export default {
   /*
   ** Headers of the page
   */

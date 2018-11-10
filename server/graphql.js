@@ -1,16 +1,11 @@
-import { Router } from 'express'
-import bodyParser from 'body-parser'
-import { graphqlExpress, graphiqlExpress } from 'apollo-server-express'
-import { makeExecutableSchema } from 'graphql-tools'
-import pubsub from '../lib/pubsub'
+import { ApolloServer , gql } from 'apollo-server-express'
+import pubsub from './lib/pubsub'
 
-import Board from '../models/board'
-import List from '../models/list'
-import Card from '../models/card'
+import Board from './models/board'
+import List from './models/list'
+import Card from './models/card'
 
-const router = Router()
-
-const typeDefs = [`
+const typeDefs = gql`
 type Query {
   board(id: String!): Board
   boards: [Board]
@@ -45,7 +40,7 @@ type Subscription {
 schema {
   query: Query
   subscription: Subscription
-}`]
+}`
 
 const resolvers = {
   Query: {
@@ -83,9 +78,6 @@ const resolvers = {
   }
 }
 
-export const schema = makeExecutableSchema({typeDefs, resolvers})
+const server = new ApolloServer({typeDefs, resolvers})
 
-router.use('/graphql', bodyParser.json(), graphqlExpress({schema}))
-router.use('/graphiql', graphiqlExpress({endpointURL: '/api/graphql'}))
-
-export default router
+export default server 

@@ -4,8 +4,10 @@ import axios from 'axios'
 Vue.use(Vuex)
 
 // window.fetch() のためのポリフィル
-require('whatwg-fetch')
-
+// SSRのときは読み込まない
+if (global.window !== undefined) {
+  require('whatwg-fetch')
+}
 const store = () => new Vuex.Store({
 
   state: {
