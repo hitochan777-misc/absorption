@@ -4,67 +4,118 @@
     <div class="hero-body">
       <div class="container has-text-centered">
         <div class="column is-4 is-offset-4">
-          <div class="box" v-if="mode === 'Login'">
+          <div
+            v-if="mode === 'Login'"
+            class="box">
             <figure class="avatar">
-              <img class="logo" src="@/static/logo.png">
+              <img
+                class="logo"
+                src="@/static/logo.png">
             </figure>
             <div class="field">
               <div class="control">
-                <input class="input is-large" type="username" placeholder="Your username" autofocus="" v-model="username" @keypress.enter="login">
-                <p class="help is-danger" v-if="errorUsername">
+                <input
+                  v-model="username"
+                  class="input is-large"
+                  type="username"
+                  placeholder="Your username"
+                  autofocus=""
+                  @keypress.enter="login">
+                <p
+                  v-if="errorUsername"
+                  class="help is-danger">
                   {{ errorUsername }}
                 </p>
               </div>
             </div>
             <div class="field">
               <div class="control">
-                <input class="input is-large" type="password" placeholder="Your password" v-model="password" @keypress.enter="login">
-                <p class="help is-danger" v-if="errorPassword">
+                <input
+                  v-model="password"
+                  class="input is-large"
+                  type="password"
+                  placeholder="Your password"
+                  @keypress.enter="login">
+                <p
+                  v-if="errorPassword"
+                  class="help is-danger">
                   {{ errorPassword }}
                 </p>
               </div>
             </div>
-            <a class="button is-primary is-large is-fullwidth" @click="login">Login</a>
-            <p class="help is-danger" v-if="errorLogin">
+            <a
+              class="button is-primary is-large is-fullwidth"
+              @click="login">Login</a>
+            <p
+              v-if="errorLogin"
+              class="help is-danger">
               {{ errorLogin }}
             </p>
           </div>
-          <div class="box" v-else>
+          <div
+            v-else
+            class="box">
             <figure class="avatar">
               <img src="/static/logo.png">
             </figure>
             <div class="field">
               <div class="control">
-                <input class="input is-large" type="username" placeholder="Your username" autofocus="" v-model="username" @keypress.enter="signup">
-                <p class="help is-danger" v-if="errorUsername">
+                <input
+                  v-model="username"
+                  class="input is-large"
+                  type="username"
+                  placeholder="Your username"
+                  autofocus=""
+                  @keypress.enter="signup">
+                <p
+                  v-if="errorUsername"
+                  class="help is-danger">
                   {{ errorUsername }}
                 </p>
               </div>
             </div>
             <div class="field">
               <div class="control">
-                <input class="input is-large" type="password" placeholder="Your password" v-model="password" @keypress.enter="signup">
-                <p class="help is-danger" v-if="errorPassword">
+                <input
+                  v-model="password"
+                  class="input is-large"
+                  type="password"
+                  placeholder="Your password"
+                  @keypress.enter="signup">
+                <p
+                  v-if="errorPassword"
+                  class="help is-danger">
                   {{ errorPassword }}
                 </p>
               </div>
             </div>
             <div class="field">
               <div class="control">
-                <input class="input is-large" type="password" placeholder="Confirm password" v-model="confirmPassword" @keypress.enter="signup">
-                <p class="help is-danger" v-if="errorConfirmPassword">
+                <input
+                  v-model="confirmPassword"
+                  class="input is-large"
+                  type="password"
+                  placeholder="Confirm password"
+                  @keypress.enter="signup">
+                <p
+                  v-if="errorConfirmPassword"
+                  class="help is-danger">
                   {{ errorConfirmPassword }}
                 </p>
               </div>
             </div>
-            <a class="button is-primary is-large is-fullwidth" @click="signup">Sign up</a>
-            <p class="help is-danger" v-if="errorLogin">
+            <a
+              class="button is-primary is-large is-fullwidth"
+              @click="signup">Sign up</a>
+            <p
+              v-if="errorLogin"
+              class="help is-danger">
               {{ errorLogin }}
             </p>
           </div>
           <p class="has-text-grey">
-              <a @click="switchMode('Login')">Login</a> &nbsp;·&nbsp;
-              <a @click="switchMode('Sign up')">Sign Up</a> 
+            <a @click="switchMode('Login')">Login</a> &nbsp;·&nbsp;
+            <a @click="switchMode('Sign up')">Sign Up</a>
           </p>
         </div>
       </div>
@@ -73,11 +124,9 @@
 </template>
 
 <script>
-import axios from '~/plugins/axios'
-
 export default {
   layout: 'login',
-  data () {
+  data() {
     return {
       mode: 'Login',
       username: '',
@@ -90,7 +139,7 @@ export default {
     }
   },
   methods: {
-    async login () {
+    async login() {
       try {
         this.errorUsername = null
         this.errorPassword = null
@@ -116,7 +165,7 @@ export default {
         this.errorLogin = e.message
       }
     },
-    async signup () {
+    async signup() {
       this.errorUsername = null
       this.errorPassword = null
       this.errorConfirmPassword = null
@@ -129,13 +178,20 @@ export default {
       if (this.errorConfirmPassword === '') {
         this.errorConfirmPassword = 'This field is required'
       }
-      if (this.errorConfirmPassword !== '' && this.password !== this.confirmPassword) {
+      if (
+        this.errorConfirmPassword !== '' &&
+        this.password !== this.confirmPassword
+      ) {
         this.errorConfirmPassword = 'Password is not matched'
       }
-      if (this.errorUsername || this.errorPassword || this.errorConfirmPassword) {
+      if (
+        this.errorUsername ||
+        this.errorPassword ||
+        this.errorConfirmPassword
+      ) {
         return
       }
-      await axios.post('/api/signup', {
+      await this.$axios.post('/api/signup', {
         username: this.username,
         password: this.password
       })
@@ -148,11 +204,11 @@ export default {
       this.errorLogin = null
       this.$router.push('/')
     },
-    switchMode (newMode) {
+    switchMode(newMode) {
       this.mode = newMode
     }
   },
-  head () {
+  head() {
     return {
       title: `login`
     }
@@ -162,8 +218,8 @@ export default {
 
 <style scoped>
 .avatar {
-    margin-top: -70px;
-    padding-bottom: 20px;
+  margin-top: -70px;
+  padding-bottom: 20px;
 }
 
 .logo {

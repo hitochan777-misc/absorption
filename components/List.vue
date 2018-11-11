@@ -1,38 +1,59 @@
 <template>
   <div class="column">
     <div class="hero is-primary">
-      <div class="hero-body" style="position:relative;">
+      <div 
+        class="hero-body" 
+        style="position:relative;">
         <h1 class="title">
           {{ title }}
         </h1>
-        <a @click="$emit('remove-list', listId)" class="delete-link" style="position: absolute; right:10px; top:10px;">
+        <a 
+          class="delete-link" 
+          style="position: absolute; right:10px; top:10px;" 
+          @click="$emit('remove-list', listId)">
           <span class="delete"/>
         </a>
       </div>
     </div>
     <div class="card">
       <div class="box">
-        <textarea class="textarea" placeholder="input content here" v-model="newcontent"></textarea>
+        <textarea 
+          v-model="newcontent" 
+          class="textarea" 
+          placeholder="input content here"/>
         <nav class="level">
           <div class="level-left"/>
           <div class="level-right">
             <p class="level-item">
-              <a class="button is-primary is-rounded" @click="addCard">Add Card</a>
+              <a 
+                class="button is-primary is-rounded" 
+                @click="addCard">Add Card</a>
             </p>
           </div>
         </nav>
       </div>
     </div>
-    <draggable :list="cards" :options="{draggable:'.item', group:'card'}" @start="onDragStart" @end="onDragEnd" @change="moveCard" class="draggable">
-      <Card v-for="(card, index) in cards" :key="index"
-            :card="card" :index="index" @removeCard="removeCard"
-            @like="like" @unlike="unlike" />
+    <draggable 
+      :list="cards" 
+      :options="{draggable:'.item', group:'card'}" 
+      class="draggable" 
+      @start="onDragStart" 
+      @end="onDragEnd" 
+      @change="moveCard">
+      <Card 
+        v-for="(card, index) in cards" 
+        :key="index"
+        :card="card" 
+        :index="index" 
+        @removeCard="removeCard"
+        @like="like" 
+        @unlike="unlike" />
     </draggable>
   </div>
 </template>
 
 <script>
-import axios from '~/plugins/axios'
+import gql from 'graphql-tag'
 import uuid from 'uuid/v1'
 import _ from 'lodash'
 import draggable from 'vuedraggable'
@@ -44,27 +65,34 @@ export default {
     Card
   },
   props: ['boardId', 'listId', 'title', 'cards'],
-  data () {
+  data() {
     return {
       newcontent: ''
     }
   },
   methods: {
-    addCard: function () {
+    addCard: function() {
       if (this.newcontent === '') {
         return
       }
       const id = uuid()
-      const newCard = { id, listId: this.listId, boardId: this.boardId, content: this.newcontent, like: [], author: this.$store.state.authUser.username }
+      const newCard = {
+        id,
+        listId: this.listId,
+        boardId: this.boardId,
+        content: this.newcontent,
+        like: [],
+        author: this.$store.state.authUser.username
+      }
       this.cards.push(newCard)
-      axios.post('/api/cards', newCard)
+      this.$axios.post('/api/cards', newCard)
       this.newcontent = ''
     },
-    removeCard: function (card, index) {
+    removeCard: function(card, index) {
       this.cards.splice(index, 1)
-      axios.delete(`/api/cards/${card.id}`)
+      this.$axios.delete(`/api/cards/${card.id}`)
     },
-    moveCard: function (event) {
+    moveCard: function(event) {
       if (event.moved) {
         let order = 0
         for (let i = event.moved.newIndex; i < this.cards.length; i++) {
@@ -72,7 +100,7 @@ export default {
             order = this.cards[i - 1].order + 1
           }
           this.cards[i].order = order
-          axios.put('/api/cards/' + this.cards[i].id, this.cards[i])
+          this.$axios.put('/api/cards/' + this.cards[i].id, this.cards[i])
         }
       }
       if (event.added) {
@@ -83,54 +111,49 @@ export default {
           }
           this.cards[i].order = order
           this.cards[i].listId = this.listId
-          axios.put('/api/cards/' + this.cards[i].id, this.cards[i])
+          this.$axios.put('/api/cards/' + this.cards[i].id, this.cards[i])
         }
       }
     },
-    onDragStart: function (event) {
+    onDragStart: function(event) {
       event.item.style.opacity = '0.4'
     },
-    onDragEnd: function (event) {
+    onDragEnd: function(event) {
       event.item.style.opacity = '1'
     },
-    like: function (card) {
+    like: function(card) {
       card.like.push(this.$store.state.authUser.username)
-      axios.post(`/api/cards/${card.id}/like`)
+      this.$axios.post(`/api/cards/${card.id}/like`)
     },
-    unlike: function (card, index) {
+    unlike: function(card, index) {
       const usename = this.$store.state.authUser.username
-      card.like = _.remove(card.like, function (user) {
+      card.like = _.remove(card.like, function(user) {
         return usename !== user
       })
-      axios.delete(`/api/cards/${card.id}/like`)
+      this.$axios.delete(`/api/cards/${card.id}/like`)
     }
   }
 }
 </script>
 
 <style scoped>
-.button
-{
+.button {
   margin-top: 10px;
 }
 
-.draggable
-{
+.draggable {
   min-height: 100px;
 }
 
-.delete-link
-{
+.delete-link {
   display: none;
 }
 
-.item:hover > header > .delete-link
-{
+.item:hover > header > .delete-link {
   display: block;
 }
 
-.hero-body:hover > .delete-link
-{
+.hero-body:hover > .delete-link {
   display: block;
 }
 </style>

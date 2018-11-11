@@ -1,22 +1,22 @@
-<p align="center">
-  <img width="200" height="200" src="./static/logo.png">
-</p>
+# absorption
+
+> Retrospective board
 
 ## Build Setup
 
 ``` bash
 # install dependencies
-$ npm install # Or yarn install
+$ yarn install
 
 # serve with hot reload at localhost:3000
-$ npm run dev
+$ yarn run dev
 
 # build for production and launch server
-$ npm start
+$ yarn run build
+$ yarn start
+
+# generate static project
+$ yarn run generate
 ```
 
-For detailed explanation on how things work, checkout the [Nuxt.js docs](https://github.com/nuxt/nuxt.js).
-
-## Backpack
-
-We use [backpack](https://github.com/palmerhq/backpack) to watch and build the application, so you can use the latest ES6 features (module syntax, async/await, etc.).
+For detailed explanation on how things work, checkout [Nuxt.js docs](https://nuxtjs.org).

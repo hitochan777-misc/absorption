@@ -1,4 +1,4 @@
-import { ApolloServer , gql } from 'apollo-server-express'
+import { ApolloServer, gql } from 'apollo-server-express'
 import pubsub from './lib/pubsub'
 
 import Board from './models/board'
@@ -6,52 +6,55 @@ import List from './models/list'
 import Card from './models/card'
 
 const typeDefs = gql`
-type Query {
-  board(id: String!): Board
-  boards: [Board]
-  list(id: String!): List
-  lists(boardId: String): [List]
-  card(id: String!): Card
-  cards(boardId: String): [Card]
-}
-type Board {
-  id: String,
-  order: Int,
-  title: String
-}
-type List {
-  id: String,
-  order: Int,
-  boardId: String,
-  title: String
-}
-type Card {
-  id: String,
-  order: Int,
-  boardId: String,
-  listId: String,
-  content: String,
-  like: [String],
-  author: String
-}
-type Subscription {
-  cardUpdated(boardId: String): Card
-}
-schema {
-  query: Query
-  subscription: Subscription
-}`
+  type Query {
+    board(id: String!): Board
+    boards: [Board]
+    list(id: String!): List
+    lists(boardId: String): [List]
+    card(id: String!): Card
+    cards(boardId: String): [Card]
+  }
+  type Board {
+    id: String
+    order: Int
+    title: String
+    lists: [List!]!
+  }
+  type List {
+    id: String
+    order: Int
+    boardId: String
+    title: String
+    cards: [Card!]!
+  }
+  type Card {
+    id: String
+    order: Int
+    boardId: String
+    listId: String
+    content: String
+    like: [String]
+    author: String
+  }
+  type Subscription {
+    cardUpdated(boardId: String): Card
+  }
+  schema {
+    query: Query
+    subscription: Subscription
+  }
+`
 
 const resolvers = {
   Query: {
     board: (root, args) => {
-      return Board.findOne({id: args.id}).exec()
+      return Board.findOne({ id: args.id }).exec()
     },
     boards: () => {
       return Board.find().exec()
     },
     list: (root, args) => {
-      return List.findOne({id: args.id}).exec()
+      return List.findOne({ id: args.id }).exec()
     },
     lists: (root, args) => {
       const query = {}
@@ -61,7 +64,7 @@ const resolvers = {
       return List.find(query).exec()
     },
     card: (root, args) => {
-      return Card.findOne({id: args.id}).exec()
+      return Card.findOne({ id: args.id }).exec()
     },
     cards: (root, args) => {
       const query = {}
@@ -78,6 +81,15 @@ const resolvers = {
   }
 }
 
-const server = new ApolloServer({typeDefs, resolvers})
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  playground: {
+    endpoint: '/graphql',
+    settings: {
+      'editor.theme': 'light'
+    }
+  }
+})
 
-export default server 
+export default server

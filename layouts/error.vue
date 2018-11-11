@@ -1,13 +1,19 @@
 <template>
   <section class="container">
-    <img src="../assets/img/logo.png" alt="Nuxt.js Logo" class="logo" />
+    <img
+      src="@/static/logo.png"
+      alt="Nuxt.js Logo"
+      class="logo" >
     <h1 class="title">
       {{ error.statusCode }}
     </h1>
     <h2 class="info">
       {{ error.message }}
     </h2>
-    <nuxt-link class="button" to="/" v-if="error.statusCode === 404">
+    <nuxt-link
+      v-if="error.statusCode === 404"
+      class="button"
+      to="/">
       Homepage
     </nuxt-link>
   </section>
@@ -19,19 +25,16 @@ export default {
 </script>
 
 <style scoped>
-.title
-{
+.title {
   margin-top: 15px;
   font-size: 5em;
 }
-.info
-{
+.info {
   font-weight: 300;
   color: #9aabb1;
   margin: 0;
 }
-.button
-{
+.button {
   margin-top: 50px;
 }
 </style>

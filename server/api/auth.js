@@ -4,14 +4,17 @@ import crypto from 'crypto'
 const router = Router()
 
 const secretKey = 'secretKey'
-const hash = (password) => {
-  return crypto.createHmac('sha256', secretKey).update(password).digest('hex')
+const hash = password => {
+  return crypto
+    .createHmac('sha256', secretKey)
+    .update(password)
+    .digest('hex')
 }
 const accounts = {
   demo: hash('demo')
 }
 
-router.post('/login', function (req, res) {
+router.post('/login', function(req, res) {
   const username = req.body.username
   const password = req.body.password
 
@@ -22,12 +25,12 @@ router.post('/login', function (req, res) {
   res.status(401).json({ error: 'Bad credentials' })
 })
 
-router.post('/logout', function (req, res) {
+router.post('/logout', function(req, res) {
   delete req.session.authUser
   res.json({ ok: true })
 })
 
-router.post('/signup', function (req, res) {
+router.post('/signup', function(req, res) {
   accounts[req.body.username] = hash(req.body.password)
   res.sendStatus(200)
 })

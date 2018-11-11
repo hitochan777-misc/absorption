@@ -2,7 +2,9 @@
   <nav class="navbar is-primary">
     <div class="navbar-brand">
       <nuxt-link :to="{ name: 'index' }">
-        <p class="navbar-item title is-3" style="color:white">Retrospective board</p>
+        <p 
+          class="navbar-item title is-3" 
+          style="color:white">Retrospective board</p>
       </nuxt-link>
     </div>
     <div class="navbar-menu">
@@ -10,7 +12,9 @@
         <div class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-link">{{ username }}</a>
           <div class="navbar-dropdown">
-            <a class="navbar-item" @click="logout">Logout</a>
+            <a 
+              class="navbar-item" 
+              @click="logout">Logout</a>
           </div>
         </div>
       </div>
@@ -21,7 +25,7 @@
 <script>
 export default {
   computed: {
-    username: function () {
+    username: function() {
       if (this.$store.state.authUser && this.$store.state.authUser.username) {
         return this.$store.state.authUser.username
       }
@@ -29,7 +33,7 @@ export default {
     }
   },
   methods: {
-    async logout () {
+    async logout() {
       await this.$store.dispatch('logout')
       this.$router.push('/login')
     }
@@ -39,6 +43,6 @@ export default {
 
 <style scoped>
 .navbar {
-  z-index: 2
+  z-index: 2;
 }
 </style>

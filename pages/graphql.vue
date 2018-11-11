@@ -1,6 +1,8 @@
 <template>
   <div>
-    <a class="button is-primary is-rounded" @click="log">Log</a>
+    <a 
+      class="button is-primary is-rounded" 
+      @click="log">Log</a>
   </div>
 </template>
 
@@ -11,41 +13,44 @@ export default {
   apollo: {
     data: {
       prefetch: true,
-      query: gql`{
-        board (id:"1") {
-          id,
-        },
-        boards {
-          id,
-          order,
-          title
-        },
-        list (id:"1") {
-          id,
-        },
-        lists (boardId:"2") {
-          id,
-          order,
-          title
-        },
-        card (id:"1") {
-          id,
-        },
-        cards (boardId:"1") {
-          id,
-          order,
-        },
-      }
+      query: gql`
+        {
+          board(id: "1") {
+            id
+          }
+          boards {
+            id
+            order
+            title
+          }
+          list(id: "1") {
+            id
+          }
+          lists(boardId: "2") {
+            id
+            order
+            title
+          }
+          card(id: "1") {
+            id
+          }
+          cards(boardId: "1") {
+            id
+            order
+          }
+        }
       `,
       update: data => data,
       subscribeToMore: {
-        document: gql`subscription cardUpdated($param: String) {
-          cardUpdated(boardId: $param) {
-            id
-            content
+        document: gql`
+          subscription cardUpdated($param: String) {
+            cardUpdated(boardId: $param) {
+              id
+              content
+            }
           }
-        }`,
-        variables () {
+        `,
+        variables() {
           return {
             param: 'this.param'
           }
@@ -57,7 +62,7 @@ export default {
     }
   },
   methods: {
-    log: function () {
+    log: function() {
       console.log(this.data)
     }
   }

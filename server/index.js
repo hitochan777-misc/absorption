@@ -1,14 +1,11 @@
 import express from 'express'
-import { Nuxt, Builder } from 'nuxt'
 import session from 'express-session'
+import consola from 'consola'
+import { Nuxt, Builder } from 'nuxt'
+import api from './api'
 import bodyParser from 'body-parser'
 import mongoose from 'mongoose'
 import { Mockgoose } from 'mockgoose'
-import { execute, subscribe } from 'graphql'
-import { createServer } from 'http'
-import { SubscriptionServer } from 'subscriptions-transport-ws'
-
-import api from './api'
 import config from '../nuxt.config.js'
 import apolloServer from './graphql'
 import { boards, cards, lists } from '../__mock__/data'
@@ -22,37 +19,21 @@ const host = process.env.HOST || '127.0.0.1'
 const port = process.env.PORT || 3000
 
 app.set('port', port)
-
+app.use(
+  session({
+    secret: 'super-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 60000 }
+  })
+)
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
-
-app.use(session({
-  secret: 'super-secret-key',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { maxAge: 60000 }
-}))
-
-// Import API Routes
 app.use('/api', api)
+apolloServer.applyMiddleware({ app })
 
 // Import and Set Nuxt.js options
 config.dev = !(process.env.NODE_ENV === 'production')
-
-// Init Nuxt.js
-const nuxt = new Nuxt(config)
-
-// Build only in dev mode
-if (config.dev) {
-  const builder = new Builder(nuxt)
-  builder.build()
-}
-
-// Give nuxt middleware to express
-app.use(nuxt.render)
-
-apolloServer.applyMiddleware({ app })
-
 
 async function init_db(isDev = true) {
   if (isDev) {
@@ -72,20 +53,25 @@ async function init_db(isDev = true) {
 }
 
 async function start() {
-  await init_db(config.dev)
+  // Init Nuxt.js
+  const nuxt = new Nuxt(config)
 
-  // const ws = createServer(app)
-  // ws.listen(port, host, () => {
-  //   return new SubscriptionServer({
-  //     execute,
-  //     subscribe,
-  //     schema
-  //   }, {
-  //     server: ws,
-  //     path: '/api/subscriptions'
-  //   })
-  // })
-  app.listen({ port }, () => { console.log("listening") })
+  // Build only in dev mode
+  if (config.dev) {
+    const builder = new Builder(nuxt)
+    await builder.build()
+  }
+
+  // Give nuxt middleware to express
+  app.use(nuxt.render)
+
+  init_db(config.dev)
+
+  // Listen the server
+  app.listen(port, host)
+  consola.ready({
+    message: `Server listening on http://${host}:${port}`,
+    badge: true
+  })
 }
-
 start()
